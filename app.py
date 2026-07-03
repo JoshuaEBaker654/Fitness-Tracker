@@ -44,25 +44,25 @@ left.pack(side="left", fill="y", padx=10, pady=10)
 left.pack_propagate(False)
 
 tk.Label(left, text="Fitness Tracker", font=("Arial", 20, "bold"),
-         bg=PANEL, fg=ACCENT).pack(pady=20)
+         bg=PANEL, fg=TEXT).pack(pady=20)
 
 # Dropdown
 tk.Label(left, text="Exercise", font=("Arial", 11),
-         bg=PANEL, fg=SUBTEXT).pack(pady=(10,2))
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
 exercise_var = tk.StringVar()
 exercise_dropdown = ttk.Combobox(left, textvariable=exercise_var, width=26)
 exercise_dropdown.pack(pady=2)
 
 # Weight
 tk.Label(left, text="Weight (lbs)", font=("Arial", 11),
-         bg=PANEL, fg=SUBTEXT).pack(pady=(10,2))
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
 weight_entry = tk.Entry(left, width=28, bg=ENTRY_BG, fg=TEXT,
                         insertbackground=TEXT, relief="flat")
 weight_entry.pack(pady=2, ipady=4)
 
 # Reps
 tk.Label(left, text="Reps", font=("Arial", 11),
-         bg=PANEL, fg=SUBTEXT).pack(pady=(10,2))
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
 reps_entry = tk.Entry(left, width=28, bg=ENTRY_BG, fg=TEXT,
                       insertbackground=TEXT, relief="flat")
 reps_entry.pack(pady=2, ipady=4)
@@ -105,7 +105,7 @@ chart_label.pack(expand=True)
 
 # ── Home tab placeholder ─────────────────────────────
 tk.Label(home_tab, text="🏠 Home", font=("Arial", 24, "bold"),
-         bg=BG, fg=ACCENT).pack(pady=20)
+         bg=BG, fg=TEXT).pack(pady=20)
 tk.Label(home_tab, text="Your highlights will appear here",
          font=("Arial", 12), bg=BG, fg=SUBTEXT).pack(pady=10)
 
@@ -115,35 +115,35 @@ left_cardio_panel.pack(side="left", fill="y", padx=10, pady=10)
 left_cardio_panel.pack_propagate(False)
 
 tk.Label(left_cardio_panel, text="Cardio Tracker", font=("Arial", 20, "bold"),
-         bg=PANEL, fg=ACCENT).pack(pady=20)
+         bg=PANEL, fg=TEXT).pack(pady=20)
 
 tk.Label(left_cardio_panel, text="Cardio Type", font=("Arial", 11),
-         bg=PANEL, fg=SUBTEXT).pack(pady=(10,2))
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
 activity_var = tk.StringVar()
 activity_dropdown = ttk.Combobox(left_cardio_panel, textvariable=activity_var, width=26)
 activity_dropdown.pack(pady=2)
 
 tk.Label(left_cardio_panel, text="Distance (miles)", font=("Arial", 11),
-         bg=PANEL, fg=SUBTEXT).pack(pady=(10,2))
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
 distance_entry = tk.Entry(left_cardio_panel, width=28, bg=ENTRY_BG, fg=TEXT,
                           insertbackground=TEXT, relief="flat")
 distance_entry.pack(pady=2, ipady=4)
 
 tk.Label(left_cardio_panel, text="Duration (minutes)", font=("Arial", 11),
-         bg=PANEL, fg=SUBTEXT).pack(pady=(10,2))
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
 duration_entry = tk.Entry(left_cardio_panel, width=28, bg=ENTRY_BG, fg=TEXT,
                           insertbackground=TEXT, relief="flat")
 duration_entry.pack(pady=2, ipady=4)
 
 tk.Label(left_cardio_panel, text="Calories Burned", font=("Arial", 11),
-         bg=PANEL, fg=SUBTEXT).pack(pady=(10,2))
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
 calories_entry = tk.Entry(left_cardio_panel, width=28, bg=ENTRY_BG, fg=TEXT,
                           insertbackground=TEXT, relief="flat")
 calories_entry.pack(pady=2, ipady=4)
 
 # Cardio Tab Right Panel
 right_panel_cardio = tk.Frame(cardio_tab, bg=BG)
-right_panel_cardio.pack(side="right", fill="y", padx=10, pady=10)
+right_panel_cardio.pack(side="right", fill="both", expand=True, padx=10, pady=10)
 
 # Cardio chart
 cardio_chart = tk.Frame(right_panel_cardio, bg=PANEL)
@@ -174,12 +174,12 @@ cardio_chart_frame = tk.Frame(right_panel_cardio, bg=PANEL)
 cardio_chart_frame.pack(fill="both", expand=True)
 
 cardio_chart_label = tk.Label(cardio_chart_frame, text="Cardio Activities", 
-                              bg=PANEL, fg=SUBTEXT, font=("Arial", 12))
+                              bg=PANEL, fg=TEXT, font=("Arial", 12))
 cardio_chart_label.pack(expand=True)
 
 # ── Body Metrics tab placeholder ─────────────────────
 tk.Label(metrics_tab, text="📊 Body Metrics", font=("Arial", 24, "bold"),
-         bg=BG, fg=ACCENT).pack(pady=20)
+         bg=BG, fg=TEXT).pack(pady=20)
 tk.Label(metrics_tab, text="Body metrics tracking coming soon",
          font=("Arial", 12), bg=BG, fg=SUBTEXT).pack(pady=10)
 
@@ -371,10 +371,99 @@ def get_personal_records(cardio_records=None):
 
 def load_cardio():
     """Loads cardio activities from the cardio.csv file to be displayed in the chart"""
+    for row in cardio_tree.get_children():
+        cardio_tree.delete(row)
+    try:
+        with open("cardio.csv", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if len(row) >= 5:
+                    pr = get_personal_records(get_cardio()).get(row[0])
+                    if pr and float(row[3]) == pr.get("calories"):
+                        cardio_tree.insert("", "end", values=row, tags=("PR",))
+                    else:
+                        cardio_tree.insert("", "end", values=row)
+    except FileNotFoundError:
+        pass
+    cardio_tree.tag_configure("PR", background="#2a5a3a", foreground="white")
+    activity_dropdown["values"] = list(get_cardio().keys())
+
+def save_cardio():
+    activity = activity_dropdown.get()
+    distance = distance_entry.get()
+    duration = duration_entry.get()
+    calories = calories_entry.get()
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open("cardio.csv", "a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([activity, distance, duration, calories, date])
+
+    distance_entry.delete(0, tk.END)
+    duration_entry.delete(0, tk.END)
+    calories_entry.delete(0, tk.END)
+
+    load_cardio()
+    print("Cardio activity saved!")
+
+def delete_cardio():
+    selected_item = cardio_tree.selection()
+    if not selected_item:
+        print("No cardio activity selected.")
+        return
+    row_values = cardio_tree.item(selected_item, "values")
+    rows = []
+    with open("cardio.csv", "r") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            rows.append(row)
+    with open("cardio.csv", "w", newline="") as file:
+        writer = csv.writer(file)
+        for row in rows:
+            if row != [str(v) for v in row_values]:
+                writer.writerow(row)
+    load_cardio()
+
+def show_cardio_progress():
+    activity = activity_dropdown.get()
+    dates, calories = [], []
+    try:
+        with open("cardio.csv", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if row[0] == activity and row[3] != '':
+                    calories.append(float(row[3]))
+                    dates.append(row[4])
+    except FileNotFoundError:
+        pass
+
+    dates_formatted = [datetime.datetime.strptime(d, "%Y-%m-%d %H:%M:%S") for d in dates]
+
+    for widget in cardio_chart_frame.winfo_children():
+        widget.destroy()
+
+    fig, ax = plt.subplots(figsize=(6, 3.5))
+    fig.patch.set_facecolor("#2a2a3e")
+    ax.set_facecolor("#1e1e2e")
+    ax.plot(dates_formatted, calories, marker="o", color="#00ff88", linewidth=2)
+    ax.set_title(f"{activity} Progress", fontsize=12, fontweight="bold",
+                 color=TEXT)
+    ax.set_xlabel("Date", fontsize=10, color=SUBTEXT)
+    ax.set_ylabel("Calories Burned", fontsize=10, color=SUBTEXT)
+    ax.tick_params(colors=SUBTEXT)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%m/%d"))
+    fig.autofmt_xdate()
+    plt.tight_layout()
+
+    canvas = FigureCanvasTkAgg(fig, master=cardio_chart_frame)
+    canvas.draw()
+    canvas.get_tk_widget().pack(fill="both", expand=True)
+    
 
 # ── Buttons ──────────────────────────────────────────
+# Lifting Tab Buttons
 tk.Button(left, text="Save Workout", command=save_workout,
-          font=("Arial", 12, "bold"), bg=ACCENT, fg="#000000",
+          font=("Arial", 12, "bold"), bg=TEXT, fg="#000000",
           relief="flat", cursor="hand2").pack(pady=(20,5), ipadx=10, ipady=6)
 
 tk.Button(left, text="Show Progress", command=show_progress,
@@ -382,6 +471,19 @@ tk.Button(left, text="Show Progress", command=show_progress,
           relief="flat", cursor="hand2").pack(pady=5, ipadx=10, ipady=6)
 
 tk.Button(left, text="Delete Workout", command=delete_workout,
+          font=("Arial", 12, "bold"), bg=RED, fg="#000000",
+          relief="flat", cursor="hand2").pack(pady=5, ipadx=10, ipady=6)
+
+# Cardio Tab Buttons
+tk.Button(left_cardio_panel, text="Save Cardio", command=save_cardio,
+          font=("Arial", 12, "bold"), bg=TEXT, fg="#000000",
+          relief="flat", cursor="hand2").pack(pady=(20,5), ipadx=10, ipady=6)
+
+tk.Button(left_cardio_panel, text="Show Cardio Progress", command=show_cardio_progress,
+          font=("Arial", 12, "bold"), bg="#4444ff", fg="#000000",
+          relief="flat", cursor="hand2").pack(pady=5, ipadx=10, ipady=6)
+
+tk.Button(left_cardio_panel, text="Delete Cardio", command=delete_cardio,
           font=("Arial", 12, "bold"), bg=RED, fg="#000000",
           relief="flat", cursor="hand2").pack(pady=5, ipadx=10, ipady=6)
 
