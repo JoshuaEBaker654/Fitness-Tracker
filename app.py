@@ -300,39 +300,77 @@ def show_progress():
 
 # Cardio Functions -------------------------------------
 
-def get_cardio():
-    cardio=[]
+def get_cardio(activity=None):
+    cardio = []
     try:
-        with open("cardio.csv", "r") as file:
+        with open("cardio.csv", "r", newline="") as file:
             reader = csv.reader(file)
             for row in reader:
-                cardio.append(row)
+                if not row or len(row) < 4:
+                    continue
+                if activity and row[0] != activity:
+                    continue
+
+                try:
+                    distance = float(row[1]) if row[1] else 0.0
+                except ValueError:
+                    distance = 0.0
+
+                try:
+                    duration = float(row[2]) if row[2] else 0.0
+                except ValueError:
+                    duration = 0.0
+
+                try:
+                    calories = float(row[3]) if row[3] else 0.0
+                except ValueError:
+                    calories = 0.0
+
+                cardio.append({
+                    "activity": row[0],
+                    "distance": distance,
+                    "duration": duration,
+                    "calories": calories,
+                })
     except FileNotFoundError:
         pass
     return cardio
 
-# def get_personal_records(cardio):
-#     pr = 0
-#     try:
-#         with open("cardio.csv", "r") as file:
-#             reader = csv.reader(file)
-#             for row in reader:
-#                 if row[2] != '' and float(row[2]) > pr:
-#                     pr = float(row[2])
-#     except FileNotFoundError:
-#         pass
-#     return pr
+def get_personal_records(cardio_records=None):
+    """Return the top cardio entry for each activity type.
 
-# def load_cardio():
-#     for row in cardio_tree.get_children():
-#         cardio_tree.delete(row)
-#     try:
-#         with open("cardio.csv", "r") as file:
-#             reader = csv.reader(file)
-#             for row in reader:
-#                 if row[1] != '':
-#                     if float(row[1]) > 0:
-#                         cardio_tree.insert("", "end", values=row, tags=
+    The best entry is selected by the highest calories value, with distance
+    and duration as secondary tie-breakers.
+    """
+    if cardio_records is None:
+        cardio_records = get_cardio()
+
+    best_records = {}
+    for record in cardio_records:
+        activity = record.get("activity")
+        if not activity:
+            continue
+
+        current = best_records.get(activity)
+        if current is None:
+            best_records[activity] = record
+            continue
+
+        compare_fields = ["calories", "distance", "duration"]
+        for field in compare_fields:
+            current_value = current.get(field, 0.0)
+            record_value = record.get(field, 0.0)
+            if record_value > current_value:
+                best_records[activity] = record
+                break
+            elif record_value < current_value:
+                break
+
+    return best_records
+
+
+def load_cardio():
+    """Loads cardio activities from the cardio.csv file to be displayed in the chart"""
 
 # ── Buttons ──────────────────────────────────────────
 tk.Button(left, text="Save Workout", command=save_workout,
