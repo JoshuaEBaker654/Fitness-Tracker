@@ -103,11 +103,90 @@ chart_label = tk.Label(chart_frame, text="Select an exercise and click Show Prog
                        bg=PANEL, fg=SUBTEXT, font=("Arial", 12))
 chart_label.pack(expand=True)
 
-# ── Home tab placeholder ─────────────────────────────
-tk.Label(home_tab, text="🏠 Home", font=("Arial", 24, "bold"),
-         bg=BG, fg=TEXT).pack(pady=20)
-tk.Label(home_tab, text="Your highlights will appear here",
-         font=("Arial", 12), bg=BG, fg=SUBTEXT).pack(pady=10)
+# ── Home Tab ─────────────────────────────────────────
+home_top = tk.Frame(home_tab, bg=BG)
+home_top.pack(fill="x", padx=20, pady=(20,10))
+
+tk.Label(home_top, text="Welcome Back 💪", font=("Arial", 24, "bold"),
+         bg=BG, fg=PANEL).pack(anchor="w")
+tk.Label(home_top, text="Here's your fitness snapshot",
+         font=("Arial", 12), bg=BG, fg=SUBTEXT).pack(anchor="w")
+
+# ── Top row of cards ─────────────────────────────────
+cards_top = tk.Frame(home_tab, bg=BG)
+cards_top.pack(fill="x", padx=20, pady=10)
+
+# Lifting PR card
+lifting_pr_card = tk.Frame(cards_top, bg=PANEL, padx=15, pady=15)
+lifting_pr_card.pack(side="left", fill="both", expand=True, padx=(0,10))
+tk.Label(lifting_pr_card, text="🏋️ Top Lifting PR", font=("Arial", 11, "bold"),
+         bg=PANEL, fg=SUBTEXT).pack(anchor="w")
+lifting_pr_label = tk.Label(lifting_pr_card, text="--", font=("Arial", 20, "bold"),
+                             bg=PANEL, fg=TEXT)
+lifting_pr_label.pack(anchor="w", pady=(5,0))
+lifting_pr_detail = tk.Label(lifting_pr_card, text="", font=("Arial", 10),
+                              bg=PANEL, fg=SUBTEXT)
+lifting_pr_detail.pack(anchor="w")
+
+# Cardio PR card
+cardio_pr_card = tk.Frame(cards_top, bg=PANEL, padx=15, pady=15)
+cardio_pr_card.pack(side="left", fill="both", expand=True, padx=(0,10))
+tk.Label(cardio_pr_card, text="🏃 Top Cardio PR", font=("Arial", 11, "bold"),
+         bg=PANEL, fg=SUBTEXT).pack(anchor="w")
+cardio_pr_label = tk.Label(cardio_pr_card, text="--", font=("Arial", 20, "bold"),
+                            bg=PANEL, fg=TEXT)
+cardio_pr_label.pack(anchor="w", pady=(5,0))
+cardio_pr_detail = tk.Label(cardio_pr_card, text="", font=("Arial", 10),
+                             bg=PANEL, fg=SUBTEXT)
+cardio_pr_detail.pack(anchor="w")
+
+# Streak card
+streak_card = tk.Frame(cards_top, bg=PANEL, padx=15, pady=15)
+streak_card.pack(side="left", fill="both", expand=True)
+tk.Label(streak_card, text="🔥 Current Streak", font=("Arial", 11, "bold"),
+         bg=PANEL, fg=SUBTEXT).pack(anchor="w")
+streak_label = tk.Label(streak_card, text="--", font=("Arial", 20, "bold"),
+                         bg=PANEL, fg=TEXT)
+streak_label.pack(anchor="w", pady=(5,0))
+tk.Label(streak_card, text="days in a row", font=("Arial", 10),
+         bg=PANEL, fg=SUBTEXT).pack(anchor="w")
+
+# ── Bottom row of cards ───────────────────────────────
+cards_bottom = tk.Frame(home_tab, bg=BG)
+cards_bottom.pack(fill="x", padx=20, pady=10)
+
+# Body metrics card
+metrics_card = tk.Frame(cards_bottom, bg=PANEL, padx=15, pady=15)
+metrics_card.pack(side="left", fill="both", expand=True, padx=(0,10))
+tk.Label(metrics_card, text="📊 Current Body Metrics", font=("Arial", 11, "bold"),
+         bg=PANEL, fg=SUBTEXT).pack(anchor="w")
+metrics_weight_label = tk.Label(metrics_card, text="Weight: --", font=("Arial", 13),
+                                 bg=PANEL, fg=TEXT)
+metrics_weight_label.pack(anchor="w", pady=(5,0))
+metrics_fat_label = tk.Label(metrics_card, text="Body Fat: --", font=("Arial", 13),
+                              bg=PANEL, fg=TEXT)
+metrics_fat_label.pack(anchor="w")
+metrics_muscle_label = tk.Label(metrics_card, text="Muscle Mass: --", font=("Arial", 13),
+                                 bg=PANEL, fg=TEXT)
+metrics_muscle_label.pack(anchor="w")
+
+# Last workout card
+last_workout_card = tk.Frame(cards_bottom, bg=PANEL, padx=15, pady=15)
+last_workout_card.pack(side="left", fill="both", expand=True, padx=(0,10))
+tk.Label(last_workout_card, text="📅 Last Workout", font=("Arial", 11, "bold"),
+         bg=PANEL, fg=SUBTEXT).pack(anchor="w")
+last_workout_label = tk.Label(last_workout_card, text="--", font=("Arial", 13),
+                               bg=PANEL, fg=TEXT, wraplength=200, justify="left")
+last_workout_label.pack(anchor="w", pady=(5,0))
+
+# Month to month card
+progress_card = tk.Frame(cards_bottom, bg=PANEL, padx=15, pady=15)
+progress_card.pack(side="left", fill="both", expand=True)
+tk.Label(progress_card, text="📈 Month to Month", font=("Arial", 11, "bold"),
+         bg=PANEL, fg=SUBTEXT).pack(anchor="w")
+monthly_label = tk.Label(progress_card, text="--", font=("Arial", 13),
+                          bg=PANEL, fg=TEXT, wraplength=200, justify="left")
+monthly_label.pack(anchor="w", pady=(5,0))
 
 # ── Cardio tab ───────────────────────────
 left_cardio_panel = tk.Frame(cardio_tab, bg=PANEL, width=320)
@@ -177,11 +256,67 @@ cardio_chart_label = tk.Label(cardio_chart_frame, text="Cardio Activities",
                               bg=PANEL, fg=TEXT, font=("Arial", 12))
 cardio_chart_label.pack(expand=True)
 
-# ── Body Metrics tab placeholder ─────────────────────
-tk.Label(metrics_tab, text="📊 Body Metrics", font=("Arial", 24, "bold"),
-         bg=BG, fg=TEXT).pack(pady=20)
-tk.Label(metrics_tab, text="Body metrics tracking coming soon",
-         font=("Arial", 12), bg=BG, fg=SUBTEXT).pack(pady=10)
+# ── Body Metrics tab (left) ───────────────────── 
+
+left_metrics_panel = tk.Frame(metrics_tab, bg=PANEL, width=320)
+left_metrics_panel.pack(side="left", fill="y", padx=10, pady=10)
+left_metrics_panel.pack_propagate(False)
+
+tk.Label(left_metrics_panel, text="Body Metrics", font=("Arial", 20, "bold"),
+         bg=PANEL, fg=TEXT).pack(pady=20)
+
+tk.Label(left_metrics_panel, text="Body Weight (lbs)", font=("Arial", 11),
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
+body_weight_var = tk.StringVar()
+body_weight_entry = tk.Entry(left_metrics_panel, textvariable=body_weight_var, width=26)
+body_weight_entry.pack(pady=2)
+
+tk.Label(left_metrics_panel, text="Body Fat (%)", font=("Arial", 11),
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
+body_fat_entry = tk.Entry(left_metrics_panel, width=26, bg=ENTRY_BG, fg=TEXT,
+                          insertbackground=TEXT, relief="flat")
+body_fat_entry.pack(pady=2)
+
+tk.Label(left_metrics_panel, text="Muscle Mass (lbs)", font=("Arial", 11),
+         bg=PANEL, fg=TEXT).pack(pady=(10,2))
+muscle_mass_entry = tk.Entry(left_metrics_panel, width=26, bg=ENTRY_BG, fg=TEXT,
+                             insertbackground=TEXT, relief="flat")
+muscle_mass_entry.pack(pady=2)
+
+# Body Metrics tab (right) ─────────────────────
+right_metrics_panel = tk.Frame(metrics_tab, bg=BG)
+right_metrics_panel.pack(side="right", fill="both", expand=True, padx=10, pady=10)
+
+metrics_chart = tk.Frame(right_metrics_panel, bg=PANEL)
+metrics_chart.pack(fill="x", pady=(0,10))
+
+metrics_style = ttk.Style()
+metrics_style.theme_use("clam")
+metrics_style.configure("Treeview",
+                background=PANEL,
+                foreground=TEXT,
+                fieldbackground=PANEL,
+                rowheight=28,
+                font=("Arial", 10))
+metrics_style.configure("Treeview.Heading",
+                background=ENTRY_BG,
+                foreground=ACCENT,
+                font=("Arial", 10, "bold"))
+
+metrics_columns = ["Weight", "Body Fat", "Muscle Mass"]
+metrics_tree = ttk.Treeview(metrics_chart, columns=metrics_columns, show="headings", height=8)
+for col in metrics_columns:
+    metrics_tree.heading(col, text=col)
+    metrics_tree.column(col, width=150)
+metrics_tree.pack(fill="x", padx=5, pady=5)
+
+# metrics chart frame
+metrics_chart_frame = tk.Frame(right_metrics_panel, bg=PANEL)
+metrics_chart_frame.pack(fill="both", expand=True)
+
+metrics_chart_label = tk.Label(metrics_chart_frame, text="Metrics", 
+                              bg=PANEL, fg=TEXT, font=("Arial", 12))
+metrics_chart_label.pack(expand=True)
 
 # ── Functions ────────────────────────────────────────
 def get_exercises():
@@ -368,6 +503,17 @@ def get_personal_records(cardio_records=None):
 
     return best_records
 
+def get_activities():
+    activities = set()
+    try:
+        with open("cardio.csv", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if row and row[0]:
+                    activities.add(row[0])
+    except FileNotFoundError:
+        pass
+    return activities
 
 def load_cardio():
     """Loads cardio activities from the cardio.csv file to be displayed in the chart"""
@@ -386,7 +532,7 @@ def load_cardio():
     except FileNotFoundError:
         pass
     cardio_tree.tag_configure("PR", background="#2a5a3a", foreground="white")
-    activity_dropdown["values"] = list(get_cardio().keys())
+    activity_dropdown["values"] = list(get_activities())
 
 def save_cardio():
     activity = activity_dropdown.get()
@@ -458,7 +604,92 @@ def show_cardio_progress():
     canvas = FigureCanvasTkAgg(fig, master=cardio_chart_frame)
     canvas.draw()
     canvas.get_tk_widget().pack(fill="both", expand=True)
+
+def load_metrics():
+    for row in metrics_tree.get_children():
+        metrics_tree.delete(row)
+    try:
+        with open("metrics.csv", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if row[0] != '':
+                    metrics_tree.insert("", "end", values=row)
+    except FileNotFoundError:
+        pass
     
+def save_metrics():
+    body_weight = body_weight_entry.get()
+    body_fat = body_fat_entry.get()
+    muscle_mass = muscle_mass_entry.get()
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open("metrics.csv", "a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([body_weight, body_fat, muscle_mass, date])
+
+    body_weight_entry.delete(0, tk.END)
+    body_fat_entry.delete(0, tk.END)
+    muscle_mass_entry.delete(0, tk.END)
+
+    load_metrics()
+    print("Metrics saved!")
+
+def show_metrics_progress():
+    dates, weights, body_fats, muscle_masses = [], [], [], []
+    try:
+        with open("metrics.csv", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if row[0] != '':
+                    weights.append(float(row[0]))
+                    body_fats.append(float(row[1]))
+                    muscle_masses.append(float(row[2]))
+                    dates.append(row[3])
+    except FileNotFoundError:
+        pass
+
+    dates_formatted = [datetime.datetime.strptime(d, "%Y-%m-%d %H:%M:%S") for d in dates]
+
+    for widget in metrics_chart_frame.winfo_children():
+        widget.destroy()
+
+    fig, ax = plt.subplots(figsize=(6, 3.5))
+    fig.patch.set_facecolor("#2a2a3e")
+    ax.set_facecolor("#1e1e2e")
+    ax.plot(dates_formatted, weights, marker="o", color="#00ff88", linewidth=2, label="Weight")
+    ax.plot(dates_formatted, body_fats, marker="o", color="#ff4444", linewidth=2, label="Body Fat")
+    ax.plot(dates_formatted, muscle_masses, marker="o", color="#4444ff", linewidth=2, label="Muscle Mass")
+    ax.set_title("Body Metrics Progress", fontsize=12, fontweight="bold",
+                 color=TEXT)
+    ax.set_xlabel("Date", fontsize=10, color=SUBTEXT)
+    ax.set_ylabel("Metrics", fontsize=10, color=SUBTEXT)
+    ax.tick_params(colors=SUBTEXT)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%m/%d"))
+    ax.legend()
+    fig.autofmt_xdate()
+    plt.tight_layout()
+
+    canvas = FigureCanvasTkAgg(fig, master=metrics_chart_frame)
+    canvas.draw()
+    canvas.get_tk_widget().pack(fill="both", expand=True)
+
+def delete_metrics():
+    selected_item = metrics_tree.selection()
+    if not selected_item:
+        print("No metrics entry selected.")
+        return
+    row_values = metrics_tree.item(selected_item, "values")
+    rows = []
+    with open("metrics.csv", "r") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            rows.append(row)
+    with open("metrics.csv", "w", newline="") as file:
+        writer = csv.writer(file)
+        for row in rows:
+            if row != [str(v) for v in row_values]:
+                writer.writerow(row)
+    load_metrics()
 
 # ── Buttons ──────────────────────────────────────────
 # Lifting Tab Buttons
@@ -487,5 +718,20 @@ tk.Button(left_cardio_panel, text="Delete Cardio", command=delete_cardio,
           font=("Arial", 12, "bold"), bg=RED, fg="#000000",
           relief="flat", cursor="hand2").pack(pady=5, ipadx=10, ipady=6)
 
+# Metrics Tab Buttons
+tk.Button(left_metrics_panel, text="Save Metrics", command=save_metrics,
+          font=("Arial", 12, "bold"), bg=TEXT, fg="#000000",
+          relief="flat", cursor="hand2").pack(pady=(20,5), ipadx=10, ipady=6)
+
+tk.Button(left_metrics_panel, text="Show Metrics Progress", command=show_metrics_progress,
+          font=("Arial", 12, "bold"), bg="#4444ff", fg="#000000",
+          relief="flat", cursor="hand2").pack(pady=5, ipadx=10, ipady=6)
+
+tk.Button(left_metrics_panel, text="Delete Metrics", command=delete_metrics,
+          font=("Arial", 12, "bold"), bg=RED, fg="#000000",
+          relief="flat", cursor="hand2").pack(pady=5, ipadx=10, ipady=6)
+
 load_workouts()
+load_cardio()
+load_metrics()
 root.mainloop()
