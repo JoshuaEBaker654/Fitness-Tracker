@@ -241,7 +241,7 @@ cardio_style.configure("Treeview.Heading",
                 foreground=ACCENT,
                 font=("Arial", 10, "bold"))
 
-cardio_columns = ["Type", "Distance", "Duration", "Calories"]
+cardio_columns = ["Type", "Distance", "Duration", "Calories", "Date"]
 cardio_tree = ttk.Treeview(cardio_chart, columns=cardio_columns, show="headings", height=8)
 for col in cardio_columns:
     cardio_tree.heading(col, text=col)
@@ -303,7 +303,7 @@ metrics_style.configure("Treeview.Heading",
                 foreground=ACCENT,
                 font=("Arial", 10, "bold"))
 
-metrics_columns = ["Weight", "Body Fat", "Muscle Mass"]
+metrics_columns = ["Weight", "Body Fat", "Muscle Mass", "Date"]
 metrics_tree = ttk.Treeview(metrics_chart, columns=metrics_columns, show="headings", height=8)
 for col in metrics_columns:
     metrics_tree.heading(col, text=col)
@@ -319,6 +319,123 @@ metrics_chart_label = tk.Label(metrics_chart_frame, text="Metrics",
 metrics_chart_label.pack(expand=True)
 
 # ── Functions ────────────────────────────────────────
+# Home Tab Functions -----------------------------------
+def top_lifting_pr():
+    pr = 0
+    exercise = ""
+    try:
+        with open("workouts.csv", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if row[1] != '':
+                    weight = float(row[1])
+                    if weight > pr:
+                        pr = weight
+                        exercise = row[0]
+    except FileNotFoundError:
+        pass
+    return exercise, pr
+
+def top_cardio_pr():
+    best_records = get_personal_records()
+    if not best_records:
+        return "", 0
+    top_activity = max(best_records.items(), key=lambda x: x[1].get("calories", 0))
+    return top_activity[0], top_activity[1].get("calories", 0)
+
+def current_streak():
+    try:
+        with open("cardio.csv", "r") as file:
+            reader = csv.reader(file)
+            dates = [datetime.datetime.strptime(row[4], "%Y-%m-%d %H:%M:%S").date() for row in reader if len(row) >= 5 and row [4] != '']
+            dates = sorted(set(dates), reverse=True)
+            streak = 0
+            today = datetime.date.today()
+            for i, date in enumerate(dates):
+                if i == 0 and date == today:
+                    streak += 1
+                elif i > 0 and (dates[i-1] - date).days == 1:
+                    streak += 1
+                else:
+                    break
+            return streak
+    except FileNotFoundError:
+        return 0
+
+
+def load_home():
+    # Lifting PR
+    exercise, pr = top_lifting_pr()
+    if exercise:
+        lifting_pr_label.config(text=f"{pr} lbs")
+        lifting_pr_detail.config(text=exercise)
+    else:
+        lifting_pr_label.config(text="No data yet")
+
+    # Cardio PR
+    activity, calories = top_cardio_pr()
+    if activity:
+        cardio_pr_label.config(text=f"{calories} cal")
+        cardio_pr_detail.config(text=activity)
+    else:
+        cardio_pr_label.config(text="No data yet")
+
+    # Current Streak
+    streak = current_streak()
+    streak_label.config(text=str(streak))
+
+    # Body Metrics
+    try:
+        with open("metrics.csv", "r") as file:
+            rows = list(csv.reader(file))
+            if rows:
+                last = rows[-1]
+                metrics_weight_label.config(text=f"Weight: {last[0]} lbs")
+                metrics_fat_label.config(text=f"Body Fat: {last[1]}%")
+                metrics_muscle_label.config(text=f"Muscle Mass: {last[2]} lbs")
+    except FileNotFoundError:
+        pass
+
+    # Last Workout
+    try:
+        with open("workouts.csv", "r") as file:
+            rows = list(csv.reader(file))
+            if rows:
+                last = rows[-1]
+                last_workout_label.config(text=f"{last[0]}\n{last[1]} lbs x {last[2]} reps\n{last[3]}")
+
+    except FileNotFoundError:
+        pass
+
+    # Month to Month
+    try:
+        with open("workouts.csv", "r") as file:
+            reader = csv.reader(file)
+            this_month, last_month = [], []
+            today = datetime.date.today()
+            for row in reader:
+                if len(row) >= 4 and row[1] != '':
+                    date = datetime.datetime.strptime(row[3], "%Y-%m-%d %H:%M:%S").date()
+                    volume = float(row[1]) * float(row[2])
+                    if date.month == today.month and date.year == today.year:
+                        this_month.append(volume)
+                    elif date.month == (today.month - 1 or 12) and date.year == (today.year if today.month > 1 else today.year - 1):
+                        last_month.append(volume)
+
+            if this_month and last_month:
+                avg_this = sum(this_month) / len(this_month)
+                avg_last = sum(last_month) / len(last_month)
+                change = ((avg_this - avg_last) / avg_last) * 100
+                arrow = "📈" if change > 0 else "📉"
+                monthly_label.config(text=f"{arrow} {change:+.1f}% vs last month")
+            elif this_month:
+                monthly_label.config(text="No data from last month to compare")
+            else:
+                monthly_label.config(text="No data this month yet")
+    except FileNotFoundError:
+        pass
+
+# Lifting Functions -----------------------------------
 def get_exercises():
     exercises = []
     try:
@@ -605,6 +722,8 @@ def show_cardio_progress():
     canvas.draw()
     canvas.get_tk_widget().pack(fill="both", expand=True)
 
+# Metrics Functions -----------------------------------
+
 def load_metrics():
     for row in metrics_tree.get_children():
         metrics_tree.delete(row)
@@ -734,4 +853,5 @@ tk.Button(left_metrics_panel, text="Delete Metrics", command=delete_metrics,
 load_workouts()
 load_cardio()
 load_metrics()
+load_home()
 root.mainloop()
