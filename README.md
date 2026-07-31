@@ -1,52 +1,121 @@
-<h1>Fitness Tracker</h1>
+# Fitness Tracker
 
-A desktop fitness tracking application built with Python, Tkinter, and Matplotlib. The application allows users to log strength workouts, monitor progress over time, and lays the foundation for tracking cardio workouts and body metrics.
+(https://github.com/JoshuaEBaker654/Fitness-Tracker/issues)
 
-<h3>Features</h3>
-<h4>🏋️ Lifting Tracker</h4>
-Record workouts including:
-<ul>
-<li>Exercise name</li>
-<li>Weight lifted</li>
-<li>Number of repetitions</li>
-</ul>  
-Automatically stores workouts in a CSV file (workouts.csv)
-Displays workout history in a table
+A desktop fitness tracking application built with Python, Tkinter, and Matplotlib. The app helps you log strength workouts, visualize progress over time, and provides a foundation for cardio and body-metrics tracking.
 
-Highlights personal records (highest weight for each exercise)
+---
 
-Delete previously logged workouts
+## Table of contents
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Data storage / CSV format](#data-storage--csv-format)
+- [How progress is calculated](#how-progress-is-calculated)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
 
-📈 Progress Visualization
-Generates a progress graph for each exercise
-using workout volume: Volume = Weight × Reps
+## Features
+### 🏋️ Lifting Tracker
+- Record workouts including exercise name, weight, and repetitions.
+- Automatically stores workouts in `workouts.csv`.
+- Displays workout history in a table.
+- Highlights personal records (highest weight per exercise).
+- Delete previously logged workouts.
 
-Displays historical progress using Matplotlib embedded directly into the application
-<h4>❤️ Cardio Tracker (In Progress)</h4>
+### 📈 Progress Visualization
+- Generates progress graphs per exercise (embedded Matplotlib figures).
+- Visualizes workout volume over time (see formula below).
 
-Current interface includes fields for:
-<ul>
-<li>Cardio activity</li>
-<li>Distance</li>
-<li>Duration</li>
-<li>Calories burned</li>
-</ul>
-The backend for cardio tracking has been started but is not yet fully implemented.
+### ❤️ Cardio Tracker (in progress)
+- UI fields for cardio activity, distance, duration, calories.
+- Backend partly implemented — more features planned.
 
-<h4>📊 Body Metrics (Planned)</h4>
+### 📊 Body Metrics (planned)
+- Dedicated tab for weight, body fat, and other health metrics.
 
-A dedicated tab has been created for future features such as:
+## Screenshots
+Add screenshots to `assets/` and link them here.
 
-Weight tracking
-Body fat percentage
-Other health metrics
+![Main window screenshot](assets/screenshot-main.png)
+![Progress graph screenshot](assets/screenshot-graph.png)
 
-<h3>Technologies Used</h3>
-<ul>
-<li>Python 3</li>
-<li>Tkinter</li>
-<li>ttk</li>
-<li>Matplotlib</li>
-<li>CSV</li>
-<li>Datetime</li>
-</ul>
+## Installation
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/JoshuaEBaker654/Fitness-Tracker.git
+   cd Fitness-Tracker
+   ```
+
+2. Create a virtual environment and install dependencies:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+3. Run the app:
+   ```bash
+   python main.py
+   ```
+
+If you don't have a `requirements.txt` yet, a minimal one might include:
+```
+tk
+matplotlib
+pandas
+```
+(Use `pip freeze > requirements.txt` after confirming working dependencies.)
+
+## Usage
+- Open the app.
+- Use the "Lifting" tab to add an exercise, weight, and reps.
+- The app appends entries to `workouts.csv` and updates the table and graphs.
+- Use the delete button to remove a selected workout row.
+
+## Data storage / CSV format
+Workouts are stored in `workouts.csv` in the repository root (or in a configurable data dir). Example header and sample row:
+
+```csv
+date,exercise,weight,reps,notes
+2026-07-30,Bench Press,100,5,Warmup+workset
+```
+
+If you plan to support timezones, durations, or more cardio fields, include columns like `duration_minutes`, `distance_km`, and `calories`.
+
+## How progress is calculated
+Progress graphs currently plot "volume" per session:
+Volume = Weight × Reps
+
+Consider adding:
+- One-rep max estimates (e.g., Epley formula)
+- Moving averages (7/28 day) to smooth noise
+
+## Roadmap
+- [x] Lifting tracker: log workouts, CSV persistence, table view
+- [x] Matplotlib visualization for lifting volume
+- [ ] Complete cardio backend and persistence
+- [ ] Implement body-metrics tracking (weight/history)
+- [ ] Add import/export (CSV) and backup features
+- [ ] Add unit tests and CI
+
+## Contributing
+Contributions welcome — please:
+1. Open an issue to discuss new features or bugs.
+2. Fork the repo and create a branch per feature: `feature/<name>`.
+3. Open a pull request with a clear description.
+
+Add a `CONTRIBUTING.md` file to standardize guidelines.
+
+## Troubleshooting
+- If the app fails to start with a Tkinter error, ensure Python was installed with Tk support, or try installing your platform's tk/tcl packages.
+- If graphs do not render, check Matplotlib backend settings or run `python -m pip install matplotlib`.
+
+## License
+This project is available under the MIT License. See `LICENSE` for details.
+
+## Contact
+Created by Joshua E. Baker — open issues or contact via GitHub profile.
