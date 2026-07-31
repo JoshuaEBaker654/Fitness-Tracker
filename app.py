@@ -32,11 +32,13 @@ home_tab    = tk.Frame(notebook, bg=BG)
 lifting_tab = tk.Frame(notebook, bg=BG)
 cardio_tab  = tk.Frame(notebook, bg=BG)
 metrics_tab = tk.Frame(notebook, bg=BG)
+# Creates the navigation tabs using Tkinter notebooks
 
 notebook.add(home_tab,    text="Home")
 notebook.add(lifting_tab, text="Lifting")
 notebook.add(cardio_tab,  text="Cardio")
 notebook.add(metrics_tab, text="Metrics")
+# Adds the tabs to the notebook
 
 # ── Left panel (LiftingTab) ─────────────────────────
 left = tk.Frame(lifting_tab, bg=PANEL, width=320)
@@ -46,21 +48,21 @@ left.pack_propagate(False)
 tk.Label(left, text="Fitness Tracker", font=("Arial", 20, "bold"),
          bg=PANEL, fg=TEXT).pack(pady=20)
 
-# Dropdown
+# Dropdown label
 tk.Label(left, text="Exercise", font=("Arial", 11),
          bg=PANEL, fg=TEXT).pack(pady=(10,2))
 exercise_var = tk.StringVar()
 exercise_dropdown = ttk.Combobox(left, textvariable=exercise_var, width=26)
 exercise_dropdown.pack(pady=2)
 
-# Weight
+# Weight label
 tk.Label(left, text="Weight (lbs)", font=("Arial", 11),
          bg=PANEL, fg=TEXT).pack(pady=(10,2))
 weight_entry = tk.Entry(left, width=28, bg=ENTRY_BG, fg=TEXT,
                         insertbackground=TEXT, relief="flat")
 weight_entry.pack(pady=2, ipady=4)
 
-# Reps
+# Reps label
 tk.Label(left, text="Reps", font=("Arial", 11),
          bg=PANEL, fg=TEXT).pack(pady=(10,2))
 reps_entry = tk.Entry(left, width=28, bg=ENTRY_BG, fg=TEXT,
@@ -95,7 +97,7 @@ for col in columns:
     tree.column(col, width=150)
 tree.pack(fill="x", padx=5, pady=5)
 
-# Chart frame
+# Chart frame label
 chart_frame = tk.Frame(right, bg=PANEL)
 chart_frame.pack(fill="both", expand=True)
 
@@ -320,43 +322,71 @@ metrics_chart_label.pack(expand=True)
 
 # ── Functions ────────────────────────────────────────
 # Home Tab Functions -----------------------------------
+
 def top_lifting_pr():
+    """
+    Scan workouts.csv and find the single heaviest weight ever lifted
+    (across all exercises), along with which exercise it was for.
+    Returns (exercise_name, pr_weight). Returns ("", 0) if no data exists.
+    """
     pr = 0
     exercise = ""
     try:
         with open("workouts.csv", "r") as file:
             reader = csv.reader(file)
             for row in reader:
-                if row[1] != '':
+                if row[1] != '':  # skip rows with no weight recorded
                     weight = float(row[1])
                     if weight > pr:
                         pr = weight
                         exercise = row[0]
     except FileNotFoundError:
+        # No workouts logged yet - just return the defaults
         pass
     return exercise, pr
 
+
 def top_cardio_pr():
+    """
+    Find the cardio activity with the highest calorie-burn personal record.
+    Uses get_personal_records() to get the best entry per activity, then
+    picks whichever activity has the highest "calories" value.
+    Returns (activity_name, calories). Returns ("", 0) if no data exists.
+    """
     best_records = get_personal_records()
     if not best_records:
         return "", 0
     top_activity = max(best_records.items(), key=lambda x: x[1].get("calories", 0))
     return top_activity[0], top_activity[1].get("calories", 0)
 
+
 def current_streak():
+    """
+    Calculate the user's current consecutive-day cardio streak.
+    Reads all cardio dates, dedupes/sorts them newest-first, then counts
+    how many days in a row (ending today) have at least one entry.
+    The streak breaks as soon as there's a gap of more than 1 day.
+    Returns an integer streak count (0 if no data or streak is broken).
+    """
     try:
         with open("cardio.csv", "r") as file:
             reader = csv.reader(file)
-            dates = [datetime.datetime.strptime(row[4], "%Y-%m-%d %H:%M:%S").date() for row in reader if len(row) >= 5 and row [4] != '']
+            # Parse the date column (index 4) for every valid row
+            dates = [datetime.datetime.strptime(row[4], "%Y-%m-%d %H:%M:%S").date()
+                     for row in reader if len(row) >= 5 and row[4] != '']
+            # Remove duplicate dates (multiple workouts same day) and sort newest first
             dates = sorted(set(dates), reverse=True)
             streak = 0
             today = datetime.date.today()
             for i, date in enumerate(dates):
                 if i == 0 and date == today:
+                    # First entry counts only if it's today
                     streak += 1
-                elif i > 0 and (dates[i-1] - date).days == 1:
+                elif i > 0 and (dates[i - 1] - date).days == 1:
+                    # Each subsequent date must be exactly 1 day before the previous one
                     streak += 1
                 else:
+                    # Gap found (or first date isn't today) - streak ends here
                     break
             return streak
     except FileNotFoundError:
@@ -364,6 +394,11 @@ def current_streak():
 
 
 def load_home():
+    """
+    Populate all the widgets on the Home tab: lifting PR, cardio PR,
+    current streak, latest body metrics, last workout summary, and
+    a month-over-month training volume comparison.
+    """
     # Lifting PR
     exercise, pr = top_lifting_pr()
     if exercise:
@@ -384,7 +419,7 @@ def load_home():
     streak = current_streak()
     streak_label.config(text=str(streak))
 
-    # Body Metrics
+    # Body Metrics - show the most recently logged entry
     try:
         with open("metrics.csv", "r") as file:
             rows = list(csv.reader(file))
@@ -396,7 +431,7 @@ def load_home():
     except FileNotFoundError:
         pass
 
-    # Last Workout
+    # Last Workout - show the most recently logged set
     try:
         with open("workouts.csv", "r") as file:
             rows = list(csv.reader(file))
@@ -407,7 +442,8 @@ def load_home():
     except FileNotFoundError:
         pass
 
-    # Month to Month
+    # Month to Month - compare average training volume (weight x reps)
+    # for the current month vs. the previous month
     try:
         with open("workouts.csv", "r") as file:
             reader = csv.reader(file)
@@ -420,6 +456,9 @@ def load_home():
                     if date.month == today.month and date.year == today.year:
                         this_month.append(volume)
                     elif date.month == (today.month - 1 or 12) and date.year == (today.year if today.month > 1 else today.year - 1):
+                        # Handles January wrap-around: (today.month - 1 or 12) turns
+                        # January (month 1 - 1 = 0, falsy) into December (12),
+                        # and the year check rolls back to the previous year
                         last_month.append(volume)
 
             if this_month and last_month:
@@ -435,8 +474,11 @@ def load_home():
     except FileNotFoundError:
         pass
 
+
 # Lifting Functions -----------------------------------
+
 def get_exercises():
+    """Return a list of unique exercise names that have ever been logged, in first-seen order."""
     exercises = []
     try:
         with open("workouts.csv", "r") as file:
@@ -448,7 +490,9 @@ def get_exercises():
         pass
     return exercises
 
+
 def get_personal_record(exercise):
+    """Return the heaviest weight ever logged for a specific exercise (0 if none logged)."""
     pr = 0
     try:
         with open("workouts.csv", "r") as f:
@@ -462,7 +506,14 @@ def get_personal_record(exercise):
         pass
     return pr
 
+
 def load_workouts():
+    """
+    Refresh the workout log table (tree view): clear existing rows,
+    reload every row from workouts.csv, and highlight rows that match
+    a personal record for their exercise. Also refreshes the exercise
+    dropdown list.
+    """
     for row in tree.get_children():
         tree.delete(row)
     try:
@@ -472,16 +523,21 @@ def load_workouts():
                 if row[1] != '':
                     pr = get_personal_record(row[0])
                     if float(row[1]) == pr:
+                        # Tag PR-matching rows so they get highlighted styling
                         tree.insert("", "end", values=row, tags=("PR",))
                     else:
                         tree.insert("", "end", values=row)
     except FileNotFoundError:
         pass
+    # Style for rows tagged as a personal record
     tree.tag_configure("PR", background="#2a5a3a", foreground="white")
     exercise_dropdown["values"] = get_exercises()
 
+
 def save_workout():
-    exercise = exercise_dropdown.get() 
+    """Append a new workout entry (exercise, weight, reps, timestamp) to workouts.csv,
+    clear the input fields, and refresh the table."""
+    exercise = exercise_dropdown.get()
     weight = weight_entry.get()
     reps = reps_entry.get()
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -496,7 +552,14 @@ def save_workout():
     load_workouts()
     print("Workout saved!")
 
+
 def delete_workout():
+    """
+    Delete the currently selected row in the workout table.
+    Since CSV files don't support in-place row deletion, this reads
+    every row, filters out the one matching the selected values,
+    and rewrites the whole file.
+    """
     selected_item = tree.selection()
     if not selected_item:
         print("No workout selected.")
@@ -515,7 +578,12 @@ def delete_workout():
     load_workouts()
     print("Workout deleted!")
 
+
 def show_progress():
+    """
+    Plot training volume (weight x reps) over time for the exercise
+    currently selected in the dropdown, and embed the chart in chart_frame.
+    """
     exercise = exercise_dropdown.get()
     dates, volumes = [], []
     try:
@@ -530,9 +598,11 @@ def show_progress():
 
     dates_formatted = [datetime.datetime.strptime(d, "%Y-%m-%d %H:%M:%S") for d in dates]
 
+    # Remove any previously drawn chart before drawing a new one
     for widget in chart_frame.winfo_children():
         widget.destroy()
 
+    # Build a dark-themed line chart of volume over time
     fig, ax = plt.subplots(figsize=(6, 3.5))
     fig.patch.set_facecolor("#2a2a3e")
     ax.set_facecolor("#1e1e2e")
@@ -546,13 +616,21 @@ def show_progress():
     fig.autofmt_xdate()
     plt.tight_layout()
 
+    # Embed the matplotlib figure into the Tkinter frame
     canvas = FigureCanvasTkAgg(fig, master=chart_frame)
     canvas.draw()
     canvas.get_tk_widget().pack(fill="both", expand=True)
 
+
 # Cardio Functions -------------------------------------
 
 def get_cardio(activity=None):
+    """
+    Load cardio entries from cardio.csv into a list of dicts, each with
+    activity/distance/duration/calories keys. If `activity` is given,
+    only entries matching that activity are returned. Malformed numeric
+    fields default to 0.0 rather than raising an error.
+    """
     cardio = []
     try:
         with open("cardio.csv", "r", newline="") as file:
@@ -588,6 +666,7 @@ def get_cardio(activity=None):
         pass
     return cardio
 
+
 def get_personal_records(cardio_records=None):
     """Return the top cardio entry for each activity type.
 
@@ -608,6 +687,7 @@ def get_personal_records(cardio_records=None):
             best_records[activity] = record
             continue
 
+        # Compare calories first; if tied, fall back to distance, then duration
         compare_fields = ["calories", "distance", "duration"]
         for field in compare_fields:
             current_value = current.get(field, 0.0)
@@ -620,7 +700,9 @@ def get_personal_records(cardio_records=None):
 
     return best_records
 
+
 def get_activities():
+    """Return the set of unique cardio activity names ever logged."""
     activities = set()
     try:
         with open("cardio.csv", "r") as file:
@@ -632,6 +714,7 @@ def get_activities():
         pass
     return activities
 
+
 def load_cardio():
     """Loads cardio activities from the cardio.csv file to be displayed in the chart"""
     for row in cardio_tree.get_children():
@@ -641,6 +724,7 @@ def load_cardio():
             reader = csv.reader(file)
             for row in reader:
                 if len(row) >= 5:
+                    # Highlight the row if it matches that activity's personal record
                     pr = get_personal_records(get_cardio()).get(row[0])
                     if pr and float(row[3]) == pr.get("calories"):
                         cardio_tree.insert("", "end", values=row, tags=("PR",))
@@ -651,7 +735,10 @@ def load_cardio():
     cardio_tree.tag_configure("PR", background="#2a5a3a", foreground="white")
     activity_dropdown["values"] = list(get_activities())
 
+
 def save_cardio():
+    """Append a new cardio entry (activity, distance, duration, calories, timestamp)
+    to cardio.csv, clear the input fields, and refresh the table."""
     activity = activity_dropdown.get()
     distance = distance_entry.get()
     duration = duration_entry.get()
@@ -669,7 +756,9 @@ def save_cardio():
     load_cardio()
     print("Cardio activity saved!")
 
+
 def delete_cardio():
+    """Delete the currently selected cardio row by rewriting cardio.csv without it."""
     selected_item = cardio_tree.selection()
     if not selected_item:
         print("No cardio activity selected.")
@@ -687,7 +776,12 @@ def delete_cardio():
                 writer.writerow(row)
     load_cardio()
 
+
 def show_cardio_progress():
+    """
+    Plot calories burned over time for the activity currently selected
+    in the dropdown, and embed the chart in cardio_chart_frame.
+    """
     activity = activity_dropdown.get()
     dates, calories = [], []
     try:
@@ -722,9 +816,11 @@ def show_cardio_progress():
     canvas.draw()
     canvas.get_tk_widget().pack(fill="both", expand=True)
 
+
 # Metrics Functions -----------------------------------
 
 def load_metrics():
+    """Refresh the body metrics table with all rows from metrics.csv."""
     for row in metrics_tree.get_children():
         metrics_tree.delete(row)
     try:
@@ -735,8 +831,11 @@ def load_metrics():
                     metrics_tree.insert("", "end", values=row)
     except FileNotFoundError:
         pass
-    
+
+
 def save_metrics():
+    """Append a new body metrics entry (weight, body fat %, muscle mass, timestamp)
+    to metrics.csv, clear the input fields, and refresh the table."""
     body_weight = body_weight_entry.get()
     body_fat = body_fat_entry.get()
     muscle_mass = muscle_mass_entry.get()
@@ -753,7 +852,12 @@ def save_metrics():
     load_metrics()
     print("Metrics saved!")
 
+
 def show_metrics_progress():
+    """
+    Plot body weight, body fat %, and muscle mass over time on the same
+    chart, and embed it in metrics_chart_frame.
+    """
     dates, weights, body_fats, muscle_masses = [], [], [], []
     try:
         with open("metrics.csv", "r") as file:
@@ -792,7 +896,9 @@ def show_metrics_progress():
     canvas.draw()
     canvas.get_tk_widget().pack(fill="both", expand=True)
 
+
 def delete_metrics():
+    """Delete the currently selected metrics row by rewriting metrics.csv without it."""
     selected_item = metrics_tree.selection()
     if not selected_item:
         print("No metrics entry selected.")
