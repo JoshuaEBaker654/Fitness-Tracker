@@ -8,9 +8,7 @@ A desktop fitness tracking application built with Python, Tkinter, and Matplotli
 
 ## Table of contents
 - [Features](#features)
-- [Screenshots](#screenshots)
 - [Installation](#installation)
-- [Usage](#usage)
 - [Data storage / CSV format](#data-storage--csv-format)
 - [How progress is calculated](#how-progress-is-calculated)
 - [Roadmap](#roadmap)
@@ -35,12 +33,6 @@ A desktop fitness tracking application built with Python, Tkinter, and Matplotli
 
 ### 📊 Body Metrics (planned)
 - Dedicated tab for weight, body fat, and other health metrics.
-
-## Screenshots
-Add screenshots to `assets/` and link them here.
-
-![Main window screenshot](assets/screenshot-main.png)
-![Progress graph screenshot](assets/screenshot-graph.png)
 
 ## Installation
 
@@ -70,12 +62,6 @@ pandas
 ```
 (Use `pip freeze > requirements.txt` after confirming working dependencies.)
 
-## Usage
-- Open the app.
-- Use the "Lifting" tab to add an exercise, weight, and reps.
-- The app appends entries to `workouts.csv` and updates the table and graphs.
-- Use the delete button to remove a selected workout row.
-
 ## Data storage / CSV format
 Workouts are stored in `workouts.csv` in the repository root (or in a configurable data dir). Example header and sample row:
 
@@ -97,8 +83,8 @@ Consider adding:
 ## Roadmap
 - [x] Lifting tracker: log workouts, CSV persistence, table view
 - [x] Matplotlib visualization for lifting volume
-- [ ] Complete cardio backend and persistence
-- [ ] Implement body-metrics tracking (weight/history)
+- [x] Complete cardio backend and persistence
+- [x] Implement body-metrics tracking (weight/history)
 - [ ] Add import/export (CSV) and backup features
 - [ ] Add unit tests and CI
 
