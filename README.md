@@ -17,7 +17,6 @@ Everything runs locally — your data lives in plain CSV files next to the app, 
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
-- [License](#license)
 
 ## Features
 
@@ -150,9 +149,6 @@ Contributions welcome — please:
 **`ModuleNotFoundError: No module named 'tkinter'`.** Your Python was built without Tk support. On Windows, re-run the installer and enable "tcl/tk and IDLE". On Debian/Ubuntu, `sudo apt install python3-tk`. On macOS, install Python from python.org or `brew install python-tk`.
 
 **Charts are blank.** Make sure an exercise or activity is selected in the dropdown and that you have at least one saved entry for it.
-
-## License
-This project is available under the MIT License. See `LICENSE` for details.
 
 ## Contact
 Created by Joshua E. Baker — open an issue or reach out via GitHub.
